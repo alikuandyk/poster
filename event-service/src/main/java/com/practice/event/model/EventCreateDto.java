@@ -1,5 +1,6 @@
 package com.practice.event.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
@@ -24,18 +25,19 @@ public class EventCreateDto {
     String description;
 
     @NotNull
-    Integer categoryId;
+    Integer category;
 
     @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future(message = "Дата событии не может быть раньше, чем через два часа от текущего момента")
     LocalDateTime eventDate;
 
-    @NotNull
-    @Valid
-    Location id;
-
     @PositiveOrZero
     Integer participantLimit;
+
+    @NotNull
+    @Valid
+    Location location;
 
     @NotNull
     Boolean paid;
