@@ -1,0 +1,2476 @@
+openapi: 3.0.1
+info:
+  description: Documentation API v1.0
+  title: 'API сервер'
+  version: "1.0"
+servers:
+- description: Generated server url
+  url: http://localhost:8080
+tags:
+- description: Публичный API для работы с подборками событий
+  name: "Public: Подборки событий"
+- description: API для работы с категориями
+  name: "Admin: Категории"
+- description: Закрытый API для работы с событиями
+  name: "Private: События"
+- description: Публичный API для работы с категориями
+  name: "Public: Категории"
+- description: API для работы с событиями
+  name: "Admin: События"
+- description: Публичный API для работы с событиями
+  name: "Public: События"
+- description: Закрытый API для работы с запросами текущего пользователя на участие
+    в событиях
+  name: "Private: Запросы на участие"
+- description: API для работы с пользователями
+  name: "Admin: Пользователи"
+- description: API для работы с подборками событий
+  name: "Admin: Подборки событий"
+paths:
+  /admin/categories:
+    post:
+      description: "Обратите внимание: имя категории должно быть уникальным"
+      operationId: addCategory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewCategoryDto'
+        description: данные добавляемой категории
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDto'
+          description: Категория добавлена
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Field: name. Error: must not be blank. Value: null"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+        "409":
+          content:
+            application/json:
+              example:
+                status: CONFLICT
+                reason: Integrity constraint has been violated.
+                message: "could not execute statement; SQL [n/a]; constraint [uq_category_name];\
+                  \ nested exception is org.hibernate.exception.ConstraintViolationException:\
+                  \ could not execute statement"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Нарушение целостности данных
+      summary: Добавление новой категории
+      tags:
+      - "Admin: Категории"
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /admin/categories/{catId}:
+    delete:
+      description: "Обратите внимание: с категорией не должно быть связано ни одно\
+        го события."
+      operationId: deleteCategory
+      parameters:
+      - description: id категории
+        explode: false
+        in: path
+        name: catId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Категория удалена
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Category with id=27 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Категория не найдена или недоступна
+        "409":
+          content:
+            application/json:
+              example:
+                status: CONFLICT
+                reason: For the requested operation the conditions are not met.
+                message: The category is not empty
+                timestamp: 2023-01-21 16:56:19
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: "Существуют события, связанные с категорией"
+      summary: Удаление категории
+      tags:
+      - "Admin: Категории"
+      x-accepts:
+      - application/json
+    patch:
+      description: "Обратите внимание: имя категории должно быть уникальным"
+      operationId: updateCategory
+      parameters:
+      - description: id категории
+        explode: false
+        in: path
+        name: catId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDto'
+        description: Данные категории для изменения
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDto'
+          description: Данные категории изменены
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Category with id=27 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Категория не найдена или недоступна
+        "409":
+          content:
+            application/json:
+              example:
+                status: CONFLICT
+                reason: Integrity constraint has been violated.
+                message: "could not execute statement; SQL [n/a]; constraint [uq_category_name];\
+                  \ nested exception is org.hibernate.exception.ConstraintViolationException:\
+                  \ could not execute statement"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Нарушение целостности данных
+      summary: Изменение категории
+      tags:
+      - "Admin: Категории"
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /admin/compilations:
+    post:
+      operationId: saveCompilation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewCompilationDto'
+        description: данные новой подборки
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompilationDto'
+          description: Подборка добавлена
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Field: title. Error: must not be blank. Value: null"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+        "409":
+          content:
+            application/json:
+              example:
+                status: CONFLICT
+                reason: Integrity constraint has been violated.
+                message: "could not execute statement; SQL [n/a]; constraint [uq_compilation_name];\
+                  \ nested exception is org.hibernate.exception.ConstraintViolationException:\
+                  \ could not execute statement"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Нарушение целостности данных
+      summary: Добавление новой подборки (подборка может не содержать событий)
+      tags:
+      - "Admin: Подборки событий"
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /admin/compilations/{compId}:
+    delete:
+      operationId: deleteCompilation
+      parameters:
+      - description: id подборки
+        explode: false
+        in: path
+        name: compId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Подборка удалена
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Compilation with id=11 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Подборка не найдена или недоступна
+      summary: Удаление подборки
+      tags:
+      - "Admin: Подборки событий"
+      x-accepts:
+      - application/json
+    patch:
+      operationId: updateCompilation
+      parameters:
+      - description: id подборки
+        explode: false
+        in: path
+        name: compId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCompilationRequest'
+        description: данные для обновления подборки
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompilationDto'
+          description: Подборка обновлена
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Category with id=27 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Подборка не найдена или недоступна
+      summary: Обновить информацию о подборке
+      tags:
+      - "Admin: Подборки событий"
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /admin/events:
+    get:
+      description: |-
+        Эндпоинт возвращает полную информацию обо всех событиях подходящих под переданные условия
+
+        В случае, если по заданным фильтрам не найдено ни одного события, возвращает пустой список
+      operationId: getEvents_2
+      parameters:
+      - description: "список id пользователей, чьи события нужно найти"
+        explode: true
+        in: query
+        name: users
+        required: false
+        schema:
+          items:
+            format: int64
+            type: integer
+          type: array
+        style: form
+      - description: список состояний в которых находятся искомые события
+        explode: true
+        in: query
+        name: states
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: список id категорий в которых будет вестись поиск
+        explode: true
+        in: query
+        name: categories
+        required: false
+        schema:
+          items:
+            format: int64
+            type: integer
+          type: array
+        style: form
+      - description: дата и время не раньше которых должно произойти событие
+        explode: true
+        in: query
+        name: rangeStart
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: дата и время не позже которых должно произойти событие
+        explode: true
+        in: query
+        name: rangeEnd
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "количество событий, которые нужно пропустить для формировани\
+          я текущего набора"
+        explode: true
+        in: query
+        name: from
+        required: false
+        schema:
+          default: 0
+          format: int32
+          minimum: 0
+          type: integer
+        style: form
+      - description: количество событий в наборе
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 10
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/EventFullDto'
+                type: array
+          description: События найдены
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Failed to convert value of type java.lang.String to required\
+                  \ type int; nested exception is java.lang.NumberFormatException:\
+                  \ For input string: ad"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+      summary: Поиск событий
+      tags:
+      - "Admin: События"
+      x-accepts:
+      - application/json
+  /admin/events/{eventId}:
+    patch:
+      description: |-
+        Редактирование данных любого события администратором. Валидация данных не требуется.
+        Обратите внимание:
+         - дата начала изменяемого события должна быть не ранее чем за час от даты публикации. (Ожидается код ошибки 409)
+        - событие можно публиковать, только если оно в состоянии ожидания публикации (Ожидается код ошибки 409)
+        - событие можно отклонить, только если оно еще не опубликовано (Ожидается код ошибки 409)
+      operationId: updateEvent_1
+      parameters:
+      - description: id события
+        explode: false
+        in: path
+        name: eventId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventAdminRequest'
+        description: Данные для изменения информации о событии
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventFullDto'
+          description: Событие отредактировано
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Event with id=2 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Событие не найдено или недоступно
+        "409":
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: For the requested operation the conditions are not met.
+                message: "Cannot publish the event because it's not in the right state:\
+                  \ PUBLISHED"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Событие не удовлетворяет правилам редактирования
+      summary: Редактирование данных события и его статуса (отклонение/публикация).
+      tags:
+      - "Admin: События"
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /admin/users:
+    get:
+      description: |-
+        Возвращает информацию обо всех пользователях (учитываются параметры ограничения выборки), либо о конкретных (учитываются указанные идентификаторы)
+
+        В случае, если по заданным фильтрам не найдено ни одного пользователя, возвращает пустой список
+      operationId: getUsers
+      parameters:
+      - description: id пользователей
+        explode: true
+        in: query
+        name: ids
+        required: false
+        schema:
+          items:
+            format: int64
+            type: integer
+          type: array
+        style: form
+      - description: "количество элементов, которые нужно пропустить для формирова\
+          ния текущего набора"
+        explode: true
+        in: query
+        name: from
+        required: false
+        schema:
+          default: 0
+          format: int32
+          minimum: 0
+          type: integer
+        style: form
+      - description: количество элементов в наборе
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 10
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserDto'
+                type: array
+          description: Пользователи найдены
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Failed to convert value of type java.lang.String to required\
+                  \ type int; nested exception is java.lang.NumberFormatException:\
+                  \ For input string: ad"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+      summary: Получение информации о пользователях
+      tags:
+      - "Admin: Пользователи"
+      x-accepts:
+      - application/json
+    post:
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUserRequest'
+        description: Данные добавляемого пользователя
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+          description: Пользователь зарегистрирован
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Field: name. Error: must not be blank. Value: null"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+        "409":
+          content:
+            application/json:
+              example:
+                status: CONFLICT
+                reason: Integrity constraint has been violated.
+                message: "could not execute statement; SQL [n/a]; constraint [uq_email];\
+                  \ nested exception is org.hibernate.exception.ConstraintViolationException:\
+                  \ could not execute statement"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Нарушение целостности данных
+      summary: Добавление нового пользователя
+      tags:
+      - "Admin: Пользователи"
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /admin/users/{userId}:
+    delete:
+      operationId: delete
+      parameters:
+      - description: id пользователя
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Пользователь удален
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: User with id=555 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Пользователь не найден или недоступен
+      summary: Удаление пользователя
+      tags:
+      - "Admin: Пользователи"
+      x-accepts:
+      - application/json
+  /categories:
+    get:
+      description: "В случае, если по заданным фильтрам не найдено ни одной катего\
+        рии, возвращает пустой список"
+      operationId: getCategories
+      parameters:
+      - description: "количество категорий, которые нужно пропустить для формирова\
+          ния текущего набора"
+        explode: true
+        in: query
+        name: from
+        required: false
+        schema:
+          default: 0
+          format: int32
+          minimum: 0
+          type: integer
+        style: form
+      - description: количество категорий в наборе
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 10
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/CategoryDto'
+                type: array
+          description: Категории найдены
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Failed to convert value of type java.lang.String to required\
+                  \ type int; nested exception is java.lang.NumberFormatException:\
+                  \ For input string: ad"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+      summary: Получение категорий
+      tags:
+      - "Public: Категории"
+      x-accepts:
+      - application/json
+  /categories/{catId}:
+    get:
+      description: "В случае, если категории с заданным id не найдено, возвращает\
+        \ статус код 404"
+      operationId: getCategory
+      parameters:
+      - description: id категории
+        explode: false
+        in: path
+        name: catId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDto'
+          description: Категория найдена
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Failed to convert value of type java.lang.String to required\
+                  \ type long; nested exception is java.lang.NumberFormatException:\
+                  \ For input string: ad"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Category with id=19 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Категория не найдена или недоступна
+      summary: Получение информации о категории по её идентификатору
+      tags:
+      - "Public: Категории"
+      x-accepts:
+      - application/json
+  /compilations:
+    get:
+      description: "В случае, если по заданным фильтрам не найдено ни одной подбор\
+        ки, возвращает пустой список"
+      operationId: getCompilations
+      parameters:
+      - description: искать только закрепленные/не закрепленные подборки
+        explode: true
+        in: query
+        name: pinned
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "количество элементов, которые нужно пропустить для формирова\
+          ния текущего набора"
+        explode: true
+        in: query
+        name: from
+        required: false
+        schema:
+          default: 0
+          format: int32
+          minimum: 0
+          type: integer
+        style: form
+      - description: количество элементов в наборе
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 10
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/CompilationDto'
+                type: array
+          description: Найдены подборки событий
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Failed to convert value of type java.lang.String to required\
+                  \ type int; nested exception is java.lang.NumberFormatException:\
+                  \ For input string: ad"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+      summary: Получение подборок событий
+      tags:
+      - "Public: Подборки событий"
+      x-accepts:
+      - application/json
+  /compilations/{compId}:
+    get:
+      description: "В случае, если подборки с заданным id не найдено, возвращает с\
+        татус код 404"
+      operationId: getCompilation
+      parameters:
+      - description: id подборки
+        explode: false
+        in: path
+        name: compId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompilationDto'
+          description: Подборка событий найдена
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Failed to convert value of type java.lang.String to required\
+                  \ type long; nested exception is java.lang.NumberFormatException:\
+                  \ For input string: ad"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Compilation with id=84 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Подборка не найдена или недоступна
+      summary: Получение подборки событий по его id
+      tags:
+      - "Public: Подборки событий"
+      x-accepts:
+      - application/json
+  /events:
+    get:
+      description: "Обратите внимание: \n- это публичный эндпоинт, соответственно\
+        \ в выдаче должны быть только опубликованные события\n- текстовый поиск (п\
+        о аннотации и подробному описанию) должен быть без учета регистра букв\n-\
+        \ если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно вы\
+        гружать события, которые произойдут позже текущей даты и времени\n- информ\
+        ация о каждом событии должна включать в себя количество просмотров и колич\
+        ество уже одобренных заявок на участие\n- информацию о том, что по этому э\
+        ндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе ста\
+        тистики\n\nВ случае, если по заданным фильтрам не найдено ни одного событи\
+        я, возвращает пустой список"
+      operationId: getEvents_1
+      parameters:
+      - description: текст для поиска в содержимом аннотации и подробном описании
+          события
+        explode: true
+        in: query
+        name: text
+        required: false
+        schema:
+          maxLength: 7000
+          minLength: 1
+          type: string
+        style: form
+      - description: список идентификаторов категорий в которых будет вестись поиск
+        explode: true
+        in: query
+        name: categories
+        required: false
+        schema:
+          items:
+            format: int64
+            type: integer
+          type: array
+        style: form
+      - description: поиск только платных/бесплатных событий
+        explode: true
+        in: query
+        name: paid
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: дата и время не раньше которых должно произойти событие
+        explode: true
+        in: query
+        name: rangeStart
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: дата и время не позже которых должно произойти событие
+        explode: true
+        in: query
+        name: rangeEnd
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: только события у которых не исчерпан лимит запросов на участие
+        explode: true
+        in: query
+        name: onlyAvailable
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      - description: "Вариант сортировки: по дате события или по количеству просмо\
+          тров"
+        explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          enum:
+          - EVENT_DATE
+          - VIEWS
+          type: string
+        style: form
+      - description: "количество событий, которые нужно пропустить для формировани\
+          я текущего набора"
+        explode: true
+        in: query
+        name: from
+        required: false
+        schema:
+          default: 0
+          format: int32
+          minimum: 0
+          type: integer
+        style: form
+      - description: количество событий в наборе
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 10
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/EventShortDto'
+                type: array
+          description: События найдены
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: Event must be published
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+      summary: Получение событий с возможностью фильтрации
+      tags:
+      - "Public: События"
+      x-accepts:
+      - application/json
+  /events/{id}:
+    get:
+      description: |-
+        Обратите внимание:
+        - событие должно быть опубликовано
+        - информация о событии должна включать в себя количество просмотров и количество подтвержденных запросов
+        - информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
+
+        В случае, если события с заданным id не найдено, возвращает статус код 404
+      operationId: getEvent_1
+      parameters:
+      - description: id события
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventFullDto'
+          description: Событие найдено
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Failed to convert value of type java.lang.String to required\
+                  \ type int; nested exception is java.lang.NumberFormatException:\
+                  \ For input string: ad"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Event with id=13 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Событие не найдено или недоступно
+      summary: Получение подробной информации об опубликованном событии по его идентификатору
+      tags:
+      - "Public: События"
+      x-accepts:
+      - application/json
+  /users/{userId}/events:
+    get:
+      description: "В случае, если по заданным фильтрам не найдено ни одного событ\
+        ия, возвращает пустой список"
+      operationId: getEvents
+      parameters:
+      - description: id текущего пользователя
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: "количество элементов, которые нужно пропустить для формирова\
+          ния текущего набора"
+        explode: true
+        in: query
+        name: from
+        required: false
+        schema:
+          default: 0
+          format: int32
+          minimum: 0
+          type: integer
+        style: form
+      - description: количество элементов в наборе
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 10
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/EventShortDto'
+                type: array
+          description: События найдены
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Failed to convert value of type java.lang.String to required\
+                  \ type int; nested exception is java.lang.NumberFormatException:\
+                  \ For input string: ad"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+      summary: "Получение событий, добавленных текущим пользователем"
+      tags:
+      - "Private: События"
+      x-accepts:
+      - application/json
+    post:
+      description: "Обратите внимание: дата и время на которые намечено событие не\
+        \ может быть раньше, чем через два часа от текущего момента"
+      operationId: addEvent
+      parameters:
+      - description: id текущего пользователя
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewEventDto'
+        description: данные добавляемого события
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventFullDto'
+          description: Событие добавлено
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Field: category. Error: must not be blank. Value: null"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+        "409":
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: For the requested operation the conditions are not met.
+                message: "Field: eventDate. Error: должно содержать дату, которая\
+                  \ еще не наступила. Value: 2020-12-31T15:10:05"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Событие не удовлетворяет правилам создания
+      summary: Добавление нового события
+      tags:
+      - "Private: События"
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /users/{userId}/events/{eventId}:
+    get:
+      description: "В случае, если события с заданным id не найдено, возвращает ст\
+        атус код 404"
+      operationId: getEvent
+      parameters:
+      - description: id текущего пользователя
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: id события
+        explode: false
+        in: path
+        name: eventId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventFullDto'
+          description: Событие найдено
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Failed to convert value of type java.lang.String to required\
+                  \ type long; nested exception is java.lang.NumberFormatException:\
+                  \ For input string: ad"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Event with id=13 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Событие не найдено или недоступно
+      summary: Получение полной информации о событии добавленном текущим пользователем
+      tags:
+      - "Private: События"
+      x-accepts:
+      - application/json
+    patch:
+      description: |
+        Обратите внимание:
+        - изменить можно только отмененные события или события в состоянии ожидания модерации (Ожидается код ошибки 409)
+        - дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента (Ожидается код ошибки 409)
+      operationId: updateEvent
+      parameters:
+      - description: id текущего пользователя
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: id редактируемого события
+        explode: false
+        in: path
+        name: eventId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventUserRequest'
+        description: Новые данные события
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventFullDto'
+          description: Событие обновлено
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: Event must not be published
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Event with id=283 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Событие не найдено или недоступно
+        "409":
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: For the requested operation the conditions are not met.
+                message: Only pending or canceled events can be changed
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Событие не удовлетворяет правилам редактирования
+      summary: Изменение события добавленного текущим пользователем
+      tags:
+      - "Private: События"
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /users/{userId}/events/{eventId}/requests:
+    get:
+      description: "В случае, если по заданным фильтрам не найдено ни одной заявки\
+        , возвращает пустой список"
+      operationId: getEventParticipants
+      parameters:
+      - description: id текущего пользователя
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: id события
+        explode: false
+        in: path
+        name: eventId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ParticipationRequestDto'
+                type: array
+          description: Найдены запросы на участие
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Failed to convert value of type java.lang.String to required\
+                  \ type int; nested exception is java.lang.NumberFormatException:\
+                  \ For input string: ad"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+      summary: Получение информации о запросах на участие в событии текущего пользователя
+      tags:
+      - "Private: События"
+      x-accepts:
+      - application/json
+    patch:
+      description: |-
+        Обратите внимание:
+        - если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
+        - нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие (Ожидается код ошибки 409)
+        - статус можно изменить только у заявок, находящихся в состоянии ожидания (Ожидается код ошибки 409)
+        - если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
+      operationId: changeRequestStatus
+      parameters:
+      - description: id текущего пользователя
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: id события текущего пользователя
+        explode: false
+        in: path
+        name: eventId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRequestStatusUpdateRequest'
+        description: Новый статус для заявок на участие в событии текущего пользователя
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventRequestStatusUpdateResult'
+          description: Статус заявок изменён
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: Request must have status PENDING
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Event with id=321 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Событие не найдено или недоступно
+        "409":
+          content:
+            application/json:
+              example:
+                status: CONFLICT
+                reason: For the requested operation the conditions are not met.
+                message: The participant limit has been reached
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Достигнут лимит одобренных заявок
+      summary: "Изменение статуса (подтверждена, отменена) заявок на участие в соб\
+        ытии текущего пользователя"
+      tags:
+      - "Private: События"
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /users/{userId}/requests:
+    get:
+      description: "В случае, если по заданным фильтрам не найдено ни одной заявки\
+        , возвращает пустой список"
+      operationId: getUserRequests
+      parameters:
+      - description: id текущего пользователя
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ParticipationRequestDto'
+                type: array
+          description: Найдены запросы на участие
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Failed to convert value of type java.lang.String to required\
+                  \ type long; nested exception is java.lang.NumberFormatException:\
+                  \ For input string: ad"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: User with id=11 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Пользователь не найден
+      summary: Получение информации о заявках текущего пользователя на участие в чужих
+        событиях
+      tags:
+      - "Private: Запросы на участие"
+      x-accepts:
+      - application/json
+    post:
+      description: |-
+        Обратите внимание:
+        - нельзя добавить повторный запрос  (Ожидается код ошибки 409)
+        - инициатор события не может добавить запрос на участие в своём событии (Ожидается код ошибки 409)
+        - нельзя участвовать в неопубликованном событии (Ожидается код ошибки 409)
+        - если у события достигнут лимит запросов на участие - необходимо вернуть ошибку  (Ожидается код ошибки 409)
+        - если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
+      operationId: addParticipationRequest
+      parameters:
+      - description: id текущего пользователя
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: id события
+        explode: true
+        in: query
+        name: eventId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: form
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParticipationRequestDto'
+          description: Заявка создана
+        "400":
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Failed to convert value of type java.lang.String to required\
+                  \ type long; nested exception is java.lang.NumberFormatException:\
+                  \ For input string: ad"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос составлен некорректно
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Event with id=13 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Событие не найдено или недоступно
+        "409":
+          content:
+            application/json:
+              example:
+                status: CONFLICT
+                reason: Integrity constraint has been violated.
+                message: "could not execute statement; SQL [n/a]; constraint [uq_request];\
+                  \ nested exception is org.hibernate.exception.ConstraintViolationException:\
+                  \ could not execute statement"
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Нарушение целостности данных
+      summary: Добавление запроса от текущего пользователя на участие в событии
+      tags:
+      - "Private: Запросы на участие"
+      x-accepts:
+      - application/json
+  /users/{userId}/requests/{requestId}/cancel:
+    patch:
+      operationId: cancelRequest
+      parameters:
+      - description: id текущего пользователя
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      - description: id запроса на участие
+        explode: false
+        in: path
+        name: requestId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParticipationRequestDto'
+          description: Заявка отменена
+        "404":
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: Request with id=2727 was not found
+                timestamp: 2022-09-07 09:10:50
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Запрос не найден или недоступен
+      summary: Отмена своего запроса на участие в событии
+      tags:
+      - "Private: Запросы на участие"
+      x-accepts:
+      - application/json
+components:
+  schemas:
+    ApiError:
+      description: Сведения об ошибке
+      example:
+        reason: For the requested operation the conditions are not met.
+        message: Only pending or canceled events can be changed
+        errors: []
+        status: FORBIDDEN
+        timestamp: 2022-06-09 06:27:23
+      properties:
+        errors:
+          description: Список стектрейсов или описания ошибок
+          example: []
+          items:
+            description: Список стектрейсов или описания ошибок
+            example: "[]"
+            type: string
+          type: array
+        message:
+          description: Сообщение об ошибке
+          example: Only pending or canceled events can be changed
+          type: string
+        reason:
+          description: Общее описание причины ошибки
+          example: For the requested operation the conditions are not met.
+          type: string
+        status:
+          description: Код статуса HTTP-ответа
+          enum:
+          - 100 CONTINUE
+          - 101 SWITCHING_PROTOCOLS
+          - 102 PROCESSING
+          - 103 CHECKPOINT
+          - 200 OK
+          - 201 CREATED
+          - 202 ACCEPTED
+          - 203 NON_AUTHORITATIVE_INFORMATION
+          - 204 NO_CONTENT
+          - 205 RESET_CONTENT
+          - 206 PARTIAL_CONTENT
+          - 207 MULTI_STATUS
+          - 208 ALREADY_REPORTED
+          - 226 IM_USED
+          - 300 MULTIPLE_CHOICES
+          - 301 MOVED_PERMANENTLY
+          - 302 FOUND
+          - 302 MOVED_TEMPORARILY
+          - 303 SEE_OTHER
+          - 304 NOT_MODIFIED
+          - 305 USE_PROXY
+          - 307 TEMPORARY_REDIRECT
+          - 308 PERMANENT_REDIRECT
+          - 400 BAD_REQUEST
+          - 401 UNAUTHORIZED
+          - 402 PAYMENT_REQUIRED
+          - 403 FORBIDDEN
+          - 404 NOT_FOUND
+          - 405 METHOD_NOT_ALLOWED
+          - 406 NOT_ACCEPTABLE
+          - 407 PROXY_AUTHENTICATION_REQUIRED
+          - 408 REQUEST_TIMEOUT
+          - 409 CONFLICT
+          - 410 GONE
+          - 411 LENGTH_REQUIRED
+          - 412 PRECONDITION_FAILED
+          - 413 PAYLOAD_TOO_LARGE
+          - 413 REQUEST_ENTITY_TOO_LARGE
+          - 414 URI_TOO_LONG
+          - 414 REQUEST_URI_TOO_LONG
+          - 415 UNSUPPORTED_MEDIA_TYPE
+          - 416 REQUESTED_RANGE_NOT_SATISFIABLE
+          - 417 EXPECTATION_FAILED
+          - 418 I_AM_A_TEAPOT
+          - 419 INSUFFICIENT_SPACE_ON_RESOURCE
+          - 420 METHOD_FAILURE
+          - 421 DESTINATION_LOCKED
+          - 422 UNPROCESSABLE_ENTITY
+          - 423 LOCKED
+          - 424 FAILED_DEPENDENCY
+          - 425 TOO_EARLY
+          - 426 UPGRADE_REQUIRED
+          - 428 PRECONDITION_REQUIRED
+          - 429 TOO_MANY_REQUESTS
+          - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
+          - 451 UNAVAILABLE_FOR_LEGAL_REASONS
+          - 500 INTERNAL_SERVER_ERROR
+          - 501 NOT_IMPLEMENTED
+          - 502 BAD_GATEWAY
+          - 503 SERVICE_UNAVAILABLE
+          - 504 GATEWAY_TIMEOUT
+          - 505 HTTP_VERSION_NOT_SUPPORTED
+          - 506 VARIANT_ALSO_NEGOTIATES
+          - 507 INSUFFICIENT_STORAGE
+          - 508 LOOP_DETECTED
+          - 509 BANDWIDTH_LIMIT_EXCEEDED
+          - 510 NOT_EXTENDED
+          - 511 NETWORK_AUTHENTICATION_REQUIRED
+          example: FORBIDDEN
+          type: string
+        timestamp:
+          description: Дата и время когда произошла ошибка (в формате "yyyy-MM-dd
+            HH:mm:ss")
+          example: 2022-06-09 06:27:23
+          type: string
+      type: object
+    CategoryDto:
+      description: Категория
+      example:
+        name: Концерты
+        id: 1
+      properties:
+        id:
+          description: Идентификатор категории
+          example: 1
+          format: int64
+          readOnly: true
+          type: integer
+        name:
+          description: Название категории
+          example: Концерты
+          maxLength: 50
+          minLength: 1
+          type: string
+      required:
+      - name
+      type: object
+    CompilationDto:
+      description: Подборка событий
+      example:
+        pinned: true
+        id: 1
+        title: Летние концерты
+        events:
+        - annotation: Эксклюзивность нашего шоу гарантирует привлечение максимальной
+            зрительской аудитории
+          category:
+            id: 1
+            name: Концерты
+          confirmedRequests: 5
+          eventDate: 2024-03-10 14:30:00
+          id: 1
+          initiator:
+            id: 3
+            name: Фёдоров Матвей
+          paid: true
+          title: Знаменитое шоу 'Летающая кукуруза'
+          views: 999
+        - annotation: "За почти три десятилетия группа 'Java Core' закрепились на\
+            \ сцене как группа, объединяющая поколения."
+          category:
+            id: 1
+            name: Концерты
+          confirmedRequests: 555
+          eventDate: 2025-09-13 21:00:00
+          id: 1
+          initiator:
+            id: 3
+            name: Паша Петров
+          paid: true
+          title: Концерт рок-группы 'Java Core'
+          views: 991
+      properties:
+        events:
+          description: Список событий входящих в подборку
+          example:
+          - annotation: Эксклюзивность нашего шоу гарантирует привлечение максимальной
+              зрительской аудитории
+            category:
+              id: 1
+              name: Концерты
+            confirmedRequests: 5
+            eventDate: 2024-03-10 14:30:00
+            id: 1
+            initiator:
+              id: 3
+              name: Фёдоров Матвей
+            paid: true
+            title: Знаменитое шоу 'Летающая кукуруза'
+            views: 999
+          - annotation: "За почти три десятилетия группа 'Java Core' закрепились н\
+              а сцене как группа, объединяющая поколения."
+            category:
+              id: 1
+              name: Концерты
+            confirmedRequests: 555
+            eventDate: 2025-09-13 21:00:00
+            id: 1
+            initiator:
+              id: 3
+              name: Паша Петров
+            paid: true
+            title: Концерт рок-группы 'Java Core'
+            views: 991
+          items:
+            $ref: '#/components/schemas/EventShortDto'
+          type: array
+          uniqueItems: true
+        id:
+          description: Идентификатор
+          example: 1
+          format: int64
+          type: integer
+        pinned:
+          description: Закреплена ли подборка на главной странице сайта
+          example: true
+          type: boolean
+        title:
+          description: Заголовок подборки
+          example: Летние концерты
+          type: string
+      required:
+      - id
+      - pinned
+      - title
+      type: object
+    EventFullDto:
+      example:
+        annotation: Эксклюзивность нашего шоу гарантирует привлечение максимальной
+          зрительской аудитории
+        initiator:
+          name: Фёдоров Матвей
+          id: 3
+        description: "Что получится, если соединить кукурузу и полёт? Создатели \"\
+          Шоу летающей кукурузы\" испытали эту идею на практике и воплотили в жизн\
+          ь инновационный проект, предлагающий свежий взгляд на развлечения..."
+        publishedOn: 2022-09-06 15:10:05
+        title: Знаменитое шоу 'Летающая кукуруза'
+        confirmedRequests: 5
+        createdOn: 2022-09-06 11:00:23
+        participantLimit: 10
+        paid: true
+        requestModeration: true
+        location:
+          lon: 37.62
+          lat: 55.754167
+        id: 1
+        state: PUBLISHED
+        category:
+          name: Концерты
+          id: 1
+        views: 999
+        eventDate: 2024-12-31 15:10:05
+      properties:
+        annotation:
+          description: Краткое описание
+          example: Эксклюзивность нашего шоу гарантирует привлечение максимальной
+            зрительской аудитории
+          type: string
+        category:
+          $ref: '#/components/schemas/CategoryDto'
+        confirmedRequests:
+          description: Количество одобренных заявок на участие в данном событии
+          example: 5
+          format: int64
+          type: integer
+        createdOn:
+          description: Дата и время создания события (в формате "yyyy-MM-dd HH:mm:ss")
+          example: 2022-09-06 11:00:23
+          type: string
+        description:
+          description: Полное описание события
+          example: "Что получится, если соединить кукурузу и полёт? Создатели \"Шо\
+            у летающей кукурузы\" испытали эту идею на практике и воплотили в жизн\
+            ь инновационный проект, предлагающий свежий взгляд на развлечения..."
+          type: string
+        eventDate:
+          description: Дата и время на которые намечено событие (в формате "yyyy-MM-dd
+            HH:mm:ss")
+          example: 2024-12-31 15:10:05
+          type: string
+        id:
+          description: Идентификатор
+          example: 1
+          format: int64
+          type: integer
+        initiator:
+          $ref: '#/components/schemas/UserShortDto'
+        location:
+          $ref: '#/components/schemas/Location'
+        paid:
+          description: Нужно ли оплачивать участие
+          example: true
+          type: boolean
+        participantLimit:
+          default: 0
+          description: Ограничение на количество участников. Значение 0 - означает
+            отсутствие ограничения
+          example: 10
+          format: int32
+          type: integer
+        publishedOn:
+          description: Дата и время публикации события (в формате "yyyy-MM-dd HH:mm:ss")
+          example: 2022-09-06 15:10:05
+          type: string
+        requestModeration:
+          default: true
+          description: Нужна ли пре-модерация заявок на участие
+          example: true
+          type: boolean
+        state:
+          description: Список состояний жизненного цикла события
+          enum:
+          - PENDING
+          - PUBLISHED
+          - CANCELED
+          example: PUBLISHED
+          type: string
+        title:
+          description: Заголовок
+          example: Знаменитое шоу 'Летающая кукуруза'
+          type: string
+        views:
+          description: Количество просмотрев события
+          example: 999
+          format: int64
+          type: integer
+      required:
+      - annotation
+      - category
+      - eventDate
+      - initiator
+      - location
+      - paid
+      - title
+      type: object
+    EventRequestStatusUpdateRequest:
+      description: Изменение статуса запроса на участие в событии текущего пользователя
+      example:
+        requestIds:
+        - 1
+        - 2
+        - 3
+        status: CONFIRMED
+      properties:
+        requestIds:
+          description: Идентификаторы запросов на участие в событии текущего пользователя
+          example:
+          - 1
+          - 2
+          - 3
+          items:
+            description: Идентификаторы запросов на участие в событии текущего пользователя
+            format: int64
+            type: integer
+          type: array
+        status:
+          description: Новый статус запроса на участие в событии текущего пользователя
+          enum:
+          - CONFIRMED
+          - REJECTED
+          example: CONFIRMED
+          type: string
+      type: object
+    EventRequestStatusUpdateResult:
+      description: Результат подтверждения/отклонения заявок на участие в событии
+      example:
+        confirmedRequests:
+        - requester: 2
+          created: 2022-09-06T21:10:05.432
+          id: 3
+          event: 1
+          status: PENDING
+        - requester: 2
+          created: 2022-09-06T21:10:05.432
+          id: 3
+          event: 1
+          status: PENDING
+        rejectedRequests:
+        - requester: 2
+          created: 2022-09-06T21:10:05.432
+          id: 3
+          event: 1
+          status: PENDING
+        - requester: 2
+          created: 2022-09-06T21:10:05.432
+          id: 3
+          event: 1
+          status: PENDING
+      properties:
+        confirmedRequests:
+          items:
+            $ref: '#/components/schemas/ParticipationRequestDto'
+          type: array
+        rejectedRequests:
+          items:
+            $ref: '#/components/schemas/ParticipationRequestDto'
+          type: array
+      type: object
+    EventShortDto:
+      description: Краткая информация о событии
+      example:
+      - annotation: Эксклюзивность нашего шоу гарантирует привлечение максимальной
+          зрительской аудитории
+        category:
+          id: 1
+          name: Концерты
+        confirmedRequests: 5
+        eventDate: 2024-03-10 14:30:00
+        id: 1
+        initiator:
+          id: 3
+          name: Фёдоров Матвей
+        paid: true
+        title: Знаменитое шоу 'Летающая кукуруза'
+        views: 999
+      - annotation: "За почти три десятилетия группа 'Java Core' закрепились на сц\
+          ене как группа, объединяющая поколения."
+        category:
+          id: 1
+          name: Концерты
+        confirmedRequests: 555
+        eventDate: 2025-09-13 21:00:00
+        id: 1
+        initiator:
+          id: 3
+          name: Паша Петров
+        paid: true
+        title: Концерт рок-группы 'Java Core'
+        views: 991
+      properties:
+        annotation:
+          description: Краткое описание
+          example: Эксклюзивность нашего шоу гарантирует привлечение максимальной
+            зрительской аудитории
+          type: string
+        category:
+          $ref: '#/components/schemas/CategoryDto'
+        confirmedRequests:
+          description: Количество одобренных заявок на участие в данном событии
+          example: 5
+          format: int64
+          type: integer
+        eventDate:
+          description: Дата и время на которые намечено событие (в формате "yyyy-MM-dd
+            HH:mm:ss")
+          example: 2024-12-31 15:10:05
+          type: string
+        id:
+          description: Идентификатор
+          example: 1
+          format: int64
+          type: integer
+        initiator:
+          $ref: '#/components/schemas/UserShortDto'
+        paid:
+          description: Нужно ли оплачивать участие
+          example: true
+          type: boolean
+        title:
+          description: Заголовок
+          example: Знаменитое шоу 'Летающая кукуруза'
+          type: string
+        views:
+          description: Количество просмотрев события
+          example: 999
+          format: int64
+          type: integer
+      required:
+      - annotation
+      - category
+      - eventDate
+      - initiator
+      - paid
+      - title
+      type: object
+    Location:
+      description: Широта и долгота места проведения события
+      example:
+        lon: 37.62
+        lat: 55.754167
+      properties:
+        lat:
+          description: Широта
+          example: 55.754167
+          format: float
+          type: number
+        lon:
+          description: Долгота
+          example: 37.62
+          format: float
+          type: number
+      type: object
+    NewCategoryDto:
+      description: Данные для добавления новой категории
+      example:
+        name: Концерты
+      properties:
+        name:
+          description: Название категории
+          example: Концерты
+          maxLength: 50
+          minLength: 1
+          type: string
+      required:
+      - name
+      type: object
+    NewCompilationDto:
+      description: Подборка событий
+      example:
+        pinned: false
+        title: Летние концерты
+        events:
+        - 1
+        - 2
+        - 3
+      properties:
+        events:
+          description: Список идентификаторов событий входящих в подборку
+          example:
+          - 1
+          - 2
+          - 3
+          items:
+            description: Список идентификаторов событий входящих в подборку
+            format: int64
+            type: integer
+          type: array
+          uniqueItems: true
+        pinned:
+          default: false
+          description: Закреплена ли подборка на главной странице сайта
+          example: false
+          type: boolean
+        title:
+          description: Заголовок подборки
+          example: Летние концерты
+          maxLength: 50
+          minLength: 1
+          type: string
+      required:
+      - title
+      type: object
+    NewEventDto:
+      description: Новое событие
+      example:
+        annotation: Сплав на байдарках похож на полет.
+        paid: true
+        description: "Сплав на байдарках похож на полет. На спокойной воде — это п\
+          арение. На бурной, порожистой — выполнение фигур высшего пилотажа. И то\
+          , и другое дарят чувство обновления, феерические эмоции, яркие впечатлен\
+          ия."
+        requestModeration: false
+        location:
+          lon: 37.62
+          lat: 55.754167
+        category: 2
+        title: Сплав на байдарках
+        participantLimit: 10
+        eventDate: 2024-12-31 15:10:05
+      properties:
+        annotation:
+          description: Краткое описание события
+          example: Сплав на байдарках похож на полет.
+          maxLength: 2000
+          minLength: 20
+          type: string
+        category:
+          description: id категории к которой относится событие
+          example: 2
+          format: int64
+          type: integer
+        description:
+          description: Полное описание события
+          example: "Сплав на байдарках похож на полет. На спокойной воде — это пар\
+            ение. На бурной, порожистой — выполнение фигур высшего пилотажа. И то\
+            , и другое дарят чувство обновления, феерические эмоции, яркие впечатл\
+            ения."
+          maxLength: 7000
+          minLength: 20
+          type: string
+        eventDate:
+          description: Дата и время на которые намечено событие. Дата и время указываются
+            в формате "yyyy-MM-dd HH:mm:ss"
+          example: 2024-12-31 15:10:05
+          type: string
+        location:
+          $ref: '#/components/schemas/Location'
+        paid:
+          default: false
+          description: Нужно ли оплачивать участие в событии
+          example: true
+          type: boolean
+        participantLimit:
+          default: 0
+          description: Ограничение на количество участников. Значение 0 - означает
+            отсутствие ограничения
+          example: 10
+          format: int32
+          type: integer
+        requestModeration:
+          default: true
+          description: "Нужна ли пре-модерация заявок на участие. Если true, то вс\
+            е заявки будут ожидать подтверждения инициатором события. Если false -\
+            \ то будут подтверждаться автоматически."
+          example: false
+          type: boolean
+        title:
+          description: Заголовок события
+          example: Сплав на байдарках
+          maxLength: 120
+          minLength: 3
+          type: string
+      required:
+      - annotation
+      - category
+      - description
+      - eventDate
+      - location
+      - title
+      type: object
+    NewUserRequest:
+      description: Данные нового пользователя
+      example:
+        name: Иван Петров
+        email: ivan.petrov@mail.ru
+      properties:
+        email:
+          description: Почтовый адрес
+          example: ivan.petrov@mail.ru
+          maxLength: 254
+          minLength: 6
+          type: string
+        name:
+          description: Имя
+          example: Иван Петров
+          maxLength: 250
+          minLength: 2
+          type: string
+      required:
+      - email
+      - name
+      type: object
+    ParticipationRequestDto:
+      description: Заявка на участие в событии
+      example:
+        requester: 2
+        created: 2022-09-06T21:10:05.432
+        id: 3
+        event: 1
+        status: PENDING
+      properties:
+        created:
+          description: Дата и время создания заявки
+          example: 2022-09-06T21:10:05.432
+          type: string
+        event:
+          description: Идентификатор события
+          example: 1
+          format: int64
+          type: integer
+        id:
+          description: Идентификатор заявки
+          example: 3
+          format: int64
+          type: integer
+        requester:
+          description: "Идентификатор пользователя, отправившего заявку"
+          example: 2
+          format: int64
+          type: integer
+        status:
+          description: Статус заявки
+          example: PENDING
+          type: string
+      type: object
+    UpdateCompilationRequest:
+      description: Изменение информации о подборке событий. Если поле в запросе не
+        указано (равно null) - значит изменение этих данных не треубется.
+      example:
+        pinned: true
+        title: Необычные фотозоны
+        events:
+        - 0
+        - 0
+      properties:
+        events:
+          description: Список id событий подборки для полной замены текущего списка
+          items:
+            description: Список id событий подборки для полной замены текущего списка
+            format: int64
+            type: integer
+          type: array
+          uniqueItems: true
+        pinned:
+          description: Закреплена ли подборка на главной странице сайта
+          example: true
+          type: boolean
+        title:
+          description: Заголовок подборки
+          example: Необычные фотозоны
+          maxLength: 50
+          minLength: 1
+          type: string
+      type: object
+    UpdateEventAdminRequest:
+      description: Данные для изменения информации о событии. Если поле в запросе
+        не указано (равно null) - значит изменение этих данных не треубется.
+      example:
+        annotation: Сап прогулки по рекам и каналам – это возможность увидеть с другого
+          ракурса
+        stateAction: PUBLISH_EVENT
+        paid: true
+        description: "От английского SUP - Stand Up Paddle — \"стоя на доске с вес\
+          лом\", гавайская разновидность сёрфинга, в котором серфер, стоя на доске\
+          , катается на волнах и при этом гребет веслом, а не руками, как в класси\
+          ческом серфинге."
+        requestModeration: false
+        location:
+          lon: 37.62
+          lat: 55.754167
+        category: 3
+        title: Сап прогулки по рекам и каналам
+        participantLimit: 7
+        eventDate: 2023-10-11 23:10:05
+      properties:
+        annotation:
+          description: Новая аннотация
+          example: Сап прогулки по рекам и каналам – это возможность увидеть с другого
+            ракурса
+          maxLength: 2000
+          minLength: 20
+          type: string
+        category:
+          description: Новая категория
+          example: 3
+          format: int64
+          type: integer
+        description:
+          description: Новое описание
+          example: "От английского SUP - Stand Up Paddle — \"стоя на доске с весло\
+            м\", гавайская разновидность сёрфинга, в котором серфер, стоя на доске\
+            , катается на волнах и при этом гребет веслом, а не руками, как в клас\
+            сическом серфинге."
+          maxLength: 7000
+          minLength: 20
+          type: string
+        eventDate:
+          description: Новые дата и время на которые намечено событие. Дата и время
+            указываются в формате "yyyy-MM-dd HH:mm:ss"
+          example: 2023-10-11 23:10:05
+          type: string
+        location:
+          $ref: '#/components/schemas/Location'
+        paid:
+          description: Новое значение флага о платности мероприятия
+          example: true
+          type: boolean
+        participantLimit:
+          description: Новый лимит пользователей
+          example: 7
+          format: int32
+          type: integer
+        requestModeration:
+          description: Нужна ли пре-модерация заявок на участие
+          example: false
+          type: boolean
+        stateAction:
+          description: Новое состояние события
+          enum:
+          - PUBLISH_EVENT
+          - REJECT_EVENT
+          type: string
+        title:
+          description: Новый заголовок
+          example: Сап прогулки по рекам и каналам
+          maxLength: 120
+          minLength: 3
+          type: string
+      type: object
+    UpdateEventUserRequest:
+      description: Данные для изменения информации о событии. Если поле в запросе
+        не указано (равно null) - значит изменение этих данных не треубется.
+      example:
+        annotation: Сап прогулки по рекам и каналам – это возможность увидеть с другого
+          ракурса
+        stateAction: CANCEL_REVIEW
+        paid: true
+        description: "От английского SUP - Stand Up Paddle — \"стоя на доске с вес\
+          лом\", гавайская разновидность сёрфинга, в котором серфер, стоя на доске\
+          , катается на волнах и при этом гребет веслом, а не руками, как в класси\
+          ческом серфинге."
+        requestModeration: false
+        location:
+          lon: 37.62
+          lat: 55.754167
+        category: 3
+        title: Сап прогулки по рекам и каналам
+        participantLimit: 7
+        eventDate: 2023-10-11 23:10:05
+      properties:
+        annotation:
+          description: Новая аннотация
+          example: Сап прогулки по рекам и каналам – это возможность увидеть с другого
+            ракурса
+          maxLength: 2000
+          minLength: 20
+          type: string
+        category:
+          description: Новая категория
+          example: 3
+          format: int64
+          type: integer
+        description:
+          description: Новое описание
+          example: "От английского SUP - Stand Up Paddle — \"стоя на доске с весло\
+            м\", гавайская разновидность сёрфинга, в котором серфер, стоя на доске\
+            , катается на волнах и при этом гребет веслом, а не руками, как в клас\
+            сическом серфинге."
+          maxLength: 7000
+          minLength: 20
+          type: string
+        eventDate:
+          description: Новые дата и время на которые намечено событие. Дата и время
+            указываются в формате "yyyy-MM-dd HH:mm:ss"
+          example: 2023-10-11 23:10:05
+          type: string
+        location:
+          $ref: '#/components/schemas/Location'
+        paid:
+          description: Новое значение флага о платности мероприятия
+          example: true
+          type: boolean
+        participantLimit:
+          description: Новый лимит пользователей
+          example: 7
+          format: int32
+          type: integer
+        requestModeration:
+          description: Нужна ли пре-модерация заявок на участие
+          example: false
+          type: boolean
+        stateAction:
+          description: Изменение сотояния события
+          enum:
+          - SEND_TO_REVIEW
+          - CANCEL_REVIEW
+          example: CANCEL_REVIEW
+          type: string
+        title:
+          description: Новый заголовок
+          example: Сап прогулки по рекам и каналам
+          maxLength: 120
+          minLength: 3
+          type: string
+      type: object
+    UserDto:
+      description: Пользователь
+      example:
+        name: Петров Иван
+        id: 1
+        email: petrov.i@mail.ru
+      properties:
+        email:
+          description: Почтовый адрес
+          example: petrov.i@mail.ru
+          type: string
+        id:
+          description: Идентификатор
+          example: 1
+          format: int64
+          readOnly: true
+          type: integer
+        name:
+          description: Имя
+          example: Петров Иван
+          type: string
+      required:
+      - email
+      - name
+      type: object
+    UserShortDto:
+      description: Пользователь (краткая информация)
+      example:
+        name: Фёдоров Матвей
+        id: 3
+      properties:
+        id:
+          description: Идентификатор
+          example: 3
+          format: int64
+          type: integer
+        name:
+          description: Имя
+          example: Фёдоров Матвей
+          type: string
+      required:
+      - id
+      - name
+      type: object
+
