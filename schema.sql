@@ -14,22 +14,22 @@ create table category
 create table events
 (
     id                 serial primary key,
-    state              varchar check ( state in ('PENDING', 'PUBLISHED', 'CANCELED')),
-    title              varchar(120)                  not null,
-    annotation         varchar(2000)                 not null,
+    state              varchar,
+    title              varchar(120)                                                   not null,
+    annotation         varchar(2000)                                                  not null,
     description        varchar(7000),
-    category_id        int8 references category (id) not null,
-    initiator_id       int8 references users (id)    not null,
+    category_id        int8 references category (id)                                  not null,
+    initiator_id       int8 references users (id)                                     not null,
     created_on         timestamp,
     published_on       timestamp,
-    event_date         timestamp                     not null,
+    event_date         timestamp                                                      not null,
     participant_limit  int8    default 0,
-    location_lat       float8                        not null,
-    location_lon       float8                        not null,
-    paid               boolean                       not null,
+    location_lat       float8                                                         not null,
+    location_lon       float8                                                         not null,
+    paid               boolean                                                        not null,
     request_moderation boolean default true,
-    confirmed_requests int8                          not null,
-    views              int8                          not null
+    confirmed_requests int8                                                           not null,
+    views              int8                                                           not null
 );
 
 create table compilations

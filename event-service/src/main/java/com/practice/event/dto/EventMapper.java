@@ -1,11 +1,12 @@
-package com.practice.event.model;
+package com.practice.event.dto;
 
 import com.practice.category.model.Category;
 import com.practice.category.model.CategoryResponseDto;
+import com.practice.event.model.Event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import static com.practice.event.model.EventFullResponseDto.*;
+import static com.practice.event.dto.EventFullResponseDto.*;
 
 @Component
 @RequiredArgsConstructor

@@ -1,9 +1,9 @@
 package com.practice.controller.personal;
 
 import com.practice.event.model.Event;
-import com.practice.event.model.EventCreateDto;
-import com.practice.event.model.EventFullResponseDto;
-import com.practice.event.model.EventMapper;
+import com.practice.event.dto.EventCreateDto;
+import com.practice.event.dto.EventFullResponseDto;
+import com.practice.event.dto.EventMapper;
 import com.practice.event.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

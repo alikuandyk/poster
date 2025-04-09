@@ -21,7 +21,7 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    State state;
+    EventState state;
     String title;
     String annotation;
     String description;

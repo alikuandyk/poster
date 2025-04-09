@@ -1,6 +1,7 @@
-package com.practice.event.model;
+package com.practice.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.practice.event.model.Location;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AccessLevel;

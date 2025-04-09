@@ -4,7 +4,7 @@ import com.practice.category.model.Category;
 import com.practice.category.repository.CategoryRepository;
 import com.practice.common.exception.NotFoundException;
 import com.practice.event.model.Event;
-import com.practice.event.model.State;
+import com.practice.event.model.EventState;
 import com.practice.event.repository.EventRepository;
 import com.practice.user.model.User;
 import com.practice.user.repository.UserRepository;
@@ -28,12 +28,16 @@ public class EventService {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundException("Категория с id " + categoryId + " не существует"));
 
-        event.setState(State.PENDING);
+        event.setState(EventState.PENDING);
         event.setInitiator(initiator);
         event.setCreatedOn(LocalDateTime.now());
         event.setConfirmedRequests(0);
         event.setViews(0);
 
         return eventRepository.save(event);
+    }
+
+    public Event findAllByInitiatorId(int userId, int from, int size) {
+        return null;
     }
 }
