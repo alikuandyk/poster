@@ -1,4 +1,4 @@
-package com.practice.user.model;
+package com.practice.event.dto;
 
 import lombok.AccessLevel;
 import lombok.Data;
