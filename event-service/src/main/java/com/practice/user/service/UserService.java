@@ -1,6 +1,6 @@
 package com.practice.user.service;
 
-import com.practice.common.exception.EntityAlreadyExistsException;
+import com.practice.common.exception.ConflictException;
 import com.practice.common.exception.NotFoundException;
 import com.practice.user.model.User;
 import com.practice.user.repository.UserRepository;
@@ -19,7 +19,7 @@ public class UserService {
     public User create(User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             String email = user.getEmail();
-            throw new EntityAlreadyExistsException("Пользователь с почтой " + email + " уже существует");
+            throw new ConflictException("Пользователь с почтой " + email + " уже существует");
         }
         return userRepository.save(user);
     }

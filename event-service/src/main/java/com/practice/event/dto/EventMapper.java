@@ -6,8 +6,6 @@ import com.practice.event.model.Event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import static com.practice.event.dto.EventFullResponseDto.*;
-
 @Component
 @RequiredArgsConstructor
 public class EventMapper {
@@ -26,6 +24,26 @@ public class EventMapper {
         event.setParticipantLimit(eventCreate.getParticipantLimit());
         event.setPaid(eventCreate.getPaid());
         event.setRequestModeration(eventCreate.getRequestModeration());
+
+        return event;
+    }
+
+    public Event fromUpdate(EventUpdateDto eventUpdate) {
+        Event event = new Event();
+
+        Category category = new Category();
+        category.setId(eventUpdate.getCategory());
+
+        event.setState(eventUpdate.getStateAction());
+        event.setTitle(eventUpdate.getTitle());
+        event.setAnnotation(eventUpdate.getAnnotation());
+        event.setDescription(eventUpdate.getDescription());
+        event.setCategory(category);
+        event.setEventDate(eventUpdate.getEventDate());
+        event.setParticipantLimit(eventUpdate.getParticipantLimit());
+        event.setLocation(eventUpdate.getLocation());
+        event.setPaid(eventUpdate.getPaid());
+        event.setRequestModeration(eventUpdate.getRequestModeration());
 
         return event;
     }
@@ -58,5 +76,28 @@ public class EventMapper {
         eventFullResponse.setViews(event.getViews());
 
         return eventFullResponse;
+    }
+
+    public EventShortResponseDto toShortResponse(Event event) {
+        EventShortResponseDto eventShortResponse = new EventShortResponseDto();
+
+        CategoryResponseDto categoryResponse = new CategoryResponseDto();
+        categoryResponse.setId(event.getCategory().getId());
+        categoryResponse.setName(event.getCategory().getName());
+
+        UserShortDto userShort = new UserShortDto();
+        userShort.setId(event.getInitiator().getId());
+        userShort.setName(event.getInitiator().getName());
+
+        eventShortResponse.setId(event.getId());
+        eventShortResponse.setTitle(event.getTitle());
+        eventShortResponse.setAnnotation(event.getAnnotation());
+        eventShortResponse.setCategory(categoryResponse);
+        eventShortResponse.setInitiator(userShort);
+        eventShortResponse.setPaid(event.getPaid());
+        eventShortResponse.setConfirmedRequests(event.getConfirmedRequests());
+        eventShortResponse.setViews(event.getViews());
+
+        return eventShortResponse;
     }
 }

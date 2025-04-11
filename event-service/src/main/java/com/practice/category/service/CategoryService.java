@@ -1,6 +1,6 @@
 package com.practice.category.service;
 
-import com.practice.common.exception.EntityAlreadyExistsException;
+import com.practice.common.exception.ConflictException;
 import com.practice.common.exception.NotFoundException;
 import com.practice.category.model.Category;
 import com.practice.category.repository.CategoryRepository;
@@ -27,7 +27,7 @@ public class CategoryService {
     public Category create(Category category) {
         if (categoryRepository.findByName(category.getName()).isPresent()) {
             String categoryName = category.getName();
-            throw new EntityAlreadyExistsException("Категория с именем " + categoryName + " уже существует");
+            throw new ConflictException("Категория с именем " + categoryName + " уже существует");
         }
         return categoryRepository.save(category);
     }
@@ -35,7 +35,7 @@ public class CategoryService {
     public Category update(int catId, Category updatedCategory) {
         if (categoryRepository.findByName(updatedCategory.getName()).isPresent()) {
             String updCatName = updatedCategory.getName();
-            throw new EntityAlreadyExistsException("Категория с именем " + updCatName + " уже существует");
+            throw new ConflictException("Категория с именем " + updCatName + " уже существует");
         }
 
         Optional<Category> optCat = categoryRepository.findById(catId);
