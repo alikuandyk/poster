@@ -61,6 +61,10 @@ public class EventService {
             throw new ConflictException("Изменить можно только отмененные события или события в состоянии ожидания");
         }
 
+        if (eventUpdate.getEventDate() != null && (eventUpdate.getEventDate().isBefore(LocalDateTime.now().plusHours(2)))) {
+            throw new ConflictException("Дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента");
+        }
+
         if (eventUpdate.getState() != null) {
             event.setState(eventUpdate.getState());
         }
@@ -102,6 +106,10 @@ public class EventService {
         }
 
         return event;
+    }
+
+    public Event updateStatusParticipationInEvent(int userId, int eventId, Event event) {
+
     }
 
     private User findUserById(int userId) {

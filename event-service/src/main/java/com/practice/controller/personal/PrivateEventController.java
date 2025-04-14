@@ -1,10 +1,7 @@
 package com.practice.controller.personal;
 
-import com.practice.event.dto.EventShortResponseDto;
+import com.practice.event.dto.*;
 import com.practice.event.model.Event;
-import com.practice.event.dto.EventCreateDto;
-import com.practice.event.dto.EventFullResponseDto;
-import com.practice.event.dto.EventMapper;
 import com.practice.event.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -41,5 +38,14 @@ public class PrivateEventController {
     @GetMapping("/{userId}/events/{eventId}")
     public EventFullResponseDto findByIdAndInitiatorId(@PathVariable int userId, @PathVariable int eventId) {
         return eventMapper.toFullResponse(eventService.findEventByInitiatorId(userId, eventId));
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/{userId}/events/{eventId}")
+    public EventFullResponseDto updateEventByInitiatorId(@PathVariable int userId,
+                                                         @PathVariable int eventId,
+                                                         @RequestBody EventUpdateDto eventUpdate) {
+        Event event = eventMapper.fromUpdate(eventUpdate);
+        return eventMapper.toFullResponse(eventService.updateEventByInitiatorId(userId, eventId, event));
     }
 }

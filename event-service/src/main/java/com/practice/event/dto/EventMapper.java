@@ -3,6 +3,7 @@ package com.practice.event.dto;
 import com.practice.category.model.Category;
 import com.practice.category.model.CategoryResponseDto;
 import com.practice.event.model.Event;
+import com.practice.event.model.EventState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -31,14 +32,21 @@ public class EventMapper {
     public Event fromUpdate(EventUpdateDto eventUpdate) {
         Event event = new Event();
 
-        Category category = new Category();
-        category.setId(eventUpdate.getCategory());
+        if (eventUpdate.getCategory() != null) {
+            Category category = new Category();
+            category.setId(eventUpdate.getCategory());
+            event.setCategory(category);
+        }
 
-        event.setState(eventUpdate.getStateAction());
+        switch (eventUpdate.getStateAction()) {
+            case SEND_TO_REVIEW -> event.setState(EventState.PENDING);
+            case CANCEL_REVIEW, REJECT_EVENT -> event.setState(EventState.CANCELED);
+            case PUBLISH_EVENT -> event.setState(EventState.PUBLISHED);
+        }
+
         event.setTitle(eventUpdate.getTitle());
         event.setAnnotation(eventUpdate.getAnnotation());
         event.setDescription(eventUpdate.getDescription());
-        event.setCategory(category);
         event.setEventDate(eventUpdate.getEventDate());
         event.setParticipantLimit(eventUpdate.getParticipantLimit());
         event.setLocation(eventUpdate.getLocation());
