@@ -108,10 +108,6 @@ public class EventService {
         return event;
     }
 
-    public Event updateStatusParticipationInEvent(int userId, int eventId, Event event) {
-
-    }
-
     private User findUserById(int userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не существует"));

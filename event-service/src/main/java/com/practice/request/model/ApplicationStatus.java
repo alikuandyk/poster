@@ -1,4 +1,4 @@
-package com.practice.event.model;
+package com.practice.request.model;
 
 public enum ApplicationStatus {
     CONFIRMED,

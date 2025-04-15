@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EventUpdateDto {
+public class EventFullUpdateDto {
     EventStateAction stateAction;
 
     @Size(min = 3, max = 120)

@@ -44,7 +44,7 @@ public class PrivateEventController {
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullResponseDto updateEventByInitiatorId(@PathVariable int userId,
                                                          @PathVariable int eventId,
-                                                         @RequestBody EventUpdateDto eventUpdate) {
+                                                         @RequestBody EventFullUpdateDto eventUpdate) {
         Event event = eventMapper.fromUpdate(eventUpdate);
         return eventMapper.toFullResponse(eventService.updateEventByInitiatorId(userId, eventId, event));
     }

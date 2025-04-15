@@ -29,7 +29,7 @@ public class EventMapper {
         return event;
     }
 
-    public Event fromUpdate(EventUpdateDto eventUpdate) {
+    public Event fromUpdate(EventFullUpdateDto eventUpdate) {
         Event event = new Event();
 
         if (eventUpdate.getCategory() != null) {

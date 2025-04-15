@@ -61,26 +61,4 @@ public class Event {
 
     @NotNull
     Integer views;
-
-    @Override
-    public String toString() {
-        return "Event{" +
-                "id=" + id +
-                ", state=" + state +
-                ", title='" + title + '\'' +
-                ", annotation='" + annotation + '\'' +
-                ", description='" + description + '\'' +
-                ", category=" + category +
-                ", initiator=" + initiator +
-                ", createdOn=" + createdOn +
-                ", publishedOn=" + publishedOn +
-                ", eventDate=" + eventDate +
-                ", participantLimit=" + participantLimit +
-                ", location=" + location +
-                ", paid=" + paid +
-                ", requestModeration=" + requestModeration +
-                ", confirmedRequests=" + confirmedRequests +
-                ", views=" + views +
-                '}';
-    }
 }
