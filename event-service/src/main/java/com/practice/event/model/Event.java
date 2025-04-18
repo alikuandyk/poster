@@ -57,7 +57,7 @@ public class Event {
     Boolean requestModeration;
 
     @Column(name = "confirmed_requests")
-    Integer confirmedRequests;
+    int confirmedRequests;
 
     @NotNull
     Integer views;

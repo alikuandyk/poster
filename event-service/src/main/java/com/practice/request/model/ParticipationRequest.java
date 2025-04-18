@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Request {
+public class ParticipationRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
@@ -28,7 +28,7 @@ public class Request {
     @JoinColumn(name = "event_id")
     Event event;
 
-    ApplicationStatus status;
+    RequestStatus status;
 
     LocalDateTime created;
 }

@@ -4,11 +4,9 @@ import com.practice.category.model.Category;
 import com.practice.category.model.CategoryResponseDto;
 import com.practice.event.model.Event;
 import com.practice.event.model.EventState;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class EventMapper {
     public Event fromCreate(EventCreateDto eventCreate) {
         Event event = new Event();
