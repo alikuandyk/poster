@@ -19,7 +19,7 @@ public class ParticipationRequestService {
     private final ParticipationRequestRepository requestRepository;
     private final EventRepository eventRepository;
 
-//    ПРОШЛЫЙ КОД
+//    ПРОШЛЫЙ КОД!!!
 //    public ParticipationRequestStatusUpdateResponseDto updateParticipationRequestStatusByRequesterId(int userId,
 //                                                                                                     int eventId,
 //                                                                                                     ParticipationRequestUpdateDto participationRequestUpdate) {
@@ -81,11 +81,15 @@ public class ParticipationRequestService {
     public void updateStatus(int userId, int eventId,
                              List<Integer> requestIds, RequestStatus updateStatus,
                              List<ParticipationRequest> confirmedRequests, List<ParticipationRequest> rejectedRequests) {
+//        Сперва проверяю, доступен ли ивент. Потом выбрасываю исключение если достигнут лимит одобренных заявок
         Event event = findEventById(eventId);
         if (event.getParticipantLimit().equals(event.getConfirmedRequests())) {
             throw new ConflictException("Достигнут лимит одобренных заявок");
         }
 
+//        Дальше проверяю, если к событию не надо подтверждение запроса или если лимит равно нулю,
+//        то подтверждаю все запросы, добавляю их всех в список, сохраняю в базе данных.
+//        Так же обновляю количество подтвержденных запросов в событии
         List<ParticipationRequest> requests = requestRepository.findAllById(requestIds);
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             for (ParticipationRequest request : requests) {
@@ -98,6 +102,9 @@ public class ParticipationRequestService {
             return;
         }
 
+//        Здесь прохожусь по всем запросам. Сперва проверяю статус запроса, если оно не в ожидании то сбрасываю исключение
+//        Если исключение не было, дальше прежде чем обновлять статус запроса, проверяю, не исчерпан ли лимит одобренных заявок.
+//        Если не исчерпан, то обновляю статус и обновляю в базе данных. Так же обновляю количество подтвержденных запросов в событии
         for (ParticipationRequest request : requests) {
             if (!request.getStatus().equals(RequestStatus.PENDING)) {
                 throw new ConflictException("Статус можно изменить только у заявок, находящихся в состоянии ожидания. Статус заявки с id "
