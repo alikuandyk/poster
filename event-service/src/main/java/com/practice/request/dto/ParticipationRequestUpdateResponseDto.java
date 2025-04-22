@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ParticipationRequestStatusUpdateResponseDto {
+public class ParticipationRequestUpdateResponseDto {
     List<ParticipationRequestResponseDto> confirmedRequests;
     List<ParticipationRequestResponseDto> rejectedRequests;
 }
