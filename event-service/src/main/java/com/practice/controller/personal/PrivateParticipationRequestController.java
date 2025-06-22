@@ -20,6 +20,12 @@ public class PrivateParticipationRequestController {
     private final ParticipationRequestService requestService;
     private final ParticipationRequestMapper requestMapper;
 
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/requests")
+    public ParticipationRequestResponseDto create(@PathVariable int userId, @RequestParam int eventId) {
+
+    }
+
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/events/{eventId}/requests")
     public ParticipationRequestUpdateResponseDto updateStatus(@PathVariable int userId, @PathVariable int eventId,
@@ -36,5 +42,15 @@ public class PrivateParticipationRequestController {
         requestUpdateResponse.setRejectedRequests(rejected);
 
         return requestUpdateResponse;
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/events/{eventId}/requests")
+    public List<ParticipationRequestResponseDto> findAllRequestsByEventId(@PathVariable int userId, @PathVariable int eventId) {
+        List<ParticipationRequest> requests = requestService.findAllRequestsByEventId(userId, eventId);
+
+        return requests.stream()
+                .map(requestMapper::toResponse)
+                .toList();
     }
 }

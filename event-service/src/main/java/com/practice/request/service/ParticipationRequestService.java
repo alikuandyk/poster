@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,64 +20,9 @@ public class ParticipationRequestService {
     private final ParticipationRequestRepository requestRepository;
     private final EventRepository eventRepository;
 
-//    ПРОШЛЫЙ КОД!!!
-//    public ParticipationRequestStatusUpdateResponseDto updateParticipationRequestStatusByRequesterId(int userId,
-//                                                                                                     int eventId,
-//                                                                                                     ParticipationRequestUpdateDto participationRequestUpdate) {
-//        Event event = findEventById(eventId);
-//        RequestStatus updateStatus = participationRequestUpdate.getStatus();
-//
-//        ParticipationRequestStatusUpdateResponseDto participationRequestStatusUpdateResponse = new ParticipationRequestStatusUpdateResponseDto();
-//        List<ParticipationRequestResponseDto> confirmedRequests = new ArrayList<>();
-//        List<ParticipationRequestResponseDto> rejectedRequests = new ArrayList<>();
-//
-//        List<ParticipationRequest> requests = participationRequestUpdate.getRequestIds().stream()
-//                .map(requestId -> requestRepository.findById(requestId)
-//                        .orElseThrow(() -> new NotFoundException("Заявка с id " + requestId + " не найден")))
-//                .toList();
-//
-//        if (event.getParticipantLimit().equals(event.getConfirmedRequests())) {
-//            throw new ConflictException("Достигнут лимит одобренных заявок");
-//        }
-//
-//        requests.stream()
-//                .filter(request -> !request.getStatus().equals("PENDING"))
-//                .findFirst()
-//                .ifPresent(request -> {
-//                    throw new ConflictException("Статус можно изменить только у заявок, находящихся в состоянии ожидания. Статус заявки с id "
-//                            + request.getId() + ": " + request.getStatus());
-//                });
-//
-//        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
-//            confirmedRequests.addAll(requests.stream()
-//                    .map(requestMapper::toResponse)
-//                    .toList());
-//
-//            participationRequestStatusUpdateResponse.setConfirmedRequests(confirmedRequests);
-//            return participationRequestStatusUpdateResponse;
-//        }
-//
-//        for (ParticipationRequest request : requests) {
-//            if (event.getParticipantLimit().equals(event.getConfirmedRequests())) {
-//                for (ParticipationRequest rejectedRequest : requests) {
-//                    rejectedRequest.setStatus(RequestStatus.REJECTED);
-//                    requestRepository.save(rejectedRequest);
-//                    rejectedRequests.add(requestMapper.toResponse(rejectedRequest));
-//                }
-//                participationRequestStatusUpdateResponse.setRejectedRequests(rejectedRequests);
-//                return participationRequestStatusUpdateResponse;
-//            }
-//            request.setStatus(updateStatus);
-//            requestRepository.save(request);
-//            confirmedRequests.add(requestMapper.toResponse(request));
-//            participationRequestStatusUpdateResponse.setConfirmedRequests(confirmedRequests);
-//            requests.remove(request);
-//
-//            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-//            eventRepository.save(event);
-//        }
-//        return participationRequestStatusUpdateResponse;
-//    }
+    public ParticipationRequest create(int userId, int eventId) {
+
+    }
 
     public void updateStatus(int userId, int eventId,
                              List<Integer> requestIds, RequestStatus updateStatus,
@@ -124,6 +70,15 @@ public class ParticipationRequestService {
         eventRepository.save(event);
     }
 
+    public List<ParticipationRequest> findAllRequestsByEventId(int userId, int eventId) {
+        Event event = findEventById(eventId);
+
+        if (event.getInitiator().getId() != userId) {
+            throw new ConflictException("Пользователь с id " + userId + " не является создателем событий с id " + event.getId());
+        }
+
+        return requestRepository.findAllRequestsByEventId(eventId);
+    }
 
     private Event findEventById(int eventId) {
         Event event = eventRepository.findById(eventId)
