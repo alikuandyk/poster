@@ -21,7 +21,10 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     EventState state;
+
     String title;
     String annotation;
     String description;

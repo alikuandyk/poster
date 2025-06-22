@@ -23,7 +23,8 @@ public class PrivateParticipationRequestController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/requests")
     public ParticipationRequestResponseDto create(@PathVariable int userId, @RequestParam int eventId) {
-
+        ParticipationRequest request = requestService.create(userId, eventId);
+        return requestMapper.toResponse(request);
     }
 
     @ResponseStatus(HttpStatus.OK)

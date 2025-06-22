@@ -21,7 +21,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse ConflictExists(ConflictException ex) {
+    public ErrorResponse conflictExists(ConflictException ex) {
         return new ErrorResponse(ex.getMessage(),
                 "Нарушение целостности данных",
                 HttpStatus.CONFLICT,
