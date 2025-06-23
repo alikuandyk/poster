@@ -1,6 +1,7 @@
 package com.practice.event.model;
 
 import com.practice.category.model.Category;
+import com.practice.compilation.model.Compilation;
 import com.practice.user.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +9,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -19,7 +21,7 @@ import java.time.LocalDateTime;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    Integer id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -64,4 +66,7 @@ public class Event {
 
     @NotNull
     Integer views;
+
+    @ManyToMany(mappedBy = "events")
+    List<Compilation> compilations;
 }

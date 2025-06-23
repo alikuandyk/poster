@@ -28,7 +28,7 @@ public class ParticipationRequestService {
         Event event = findEventById(eventId);
 
         if (userId == event.getInitiator().getId()) {
-            throw new ConflictException("Инициатор события не может добавить запрос на участие в своем событии");
+            throw new ConflictException("Инициатор событий не может добавить запрос на участие в своем событии");
         }
 
         if (!event.getState().equals(EventState.PUBLISHED)) {

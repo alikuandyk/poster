@@ -18,11 +18,11 @@ public class EventCreateDto {
     String title;
 
     @NotBlank
-    @Size(min = 20, max = 2000, message = "Краткое описание события долен содержать от 20 до 2000 символов")
+    @Size(min = 20, max = 2000, message = "Краткое описание события должен содержать от 20 до 2000 символов")
     String annotation;
 
     @NotBlank
-    @Size(min = 20, max = 7000, message = "Полное описание события долен содержать от 20 до 7000 символов")
+    @Size(min = 20, max = 7000, message = "Полное описание события должен содержать от 20 до 7000 символов")
     String description;
 
     @NotNull
