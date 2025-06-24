@@ -1,8 +1,10 @@
 package com.practice.compilation.dto;
 
+import com.practice.category.model.CategoryResponseDto;
 import com.practice.compilation.model.Compilation;
 import com.practice.event.dto.EventMapper;
 import com.practice.event.dto.EventShortResponseDto;
+import com.practice.event.dto.UserShortDto;
 import com.practice.event.model.Event;
 import com.practice.event.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CompilationMapper {
     private final EventRepository eventRepository;
-    private final EventMapper eventMapper;
 
     public Compilation fromCreate(CompilationCreateDto compilationCreate) {
         Compilation compilation = new Compilation();
@@ -44,7 +45,32 @@ public class CompilationMapper {
                 ? Collections.emptyList()
                 : compilation.getEvents().stream()
                 .filter(event -> event != null && event.getId() != null)
-                .map(eventMapper::toShortResponse)
+                .map(event -> {
+                    EventShortResponseDto eventShortResponse = new EventShortResponseDto();
+                    eventShortResponse.setId(event.getId());
+                    eventShortResponse.setTitle(event.getTitle());
+                    eventShortResponse.setAnnotation(event.getAnnotation());
+                    eventShortResponse.setEventDate(event.getEventDate());
+                    eventShortResponse.setPaid(event.getPaid());
+                    eventShortResponse.setConfirmedRequests(event.getConfirmedRequests());
+                    eventShortResponse.setViews(event.getViews());
+
+                    if (event.getCategory() != null) {
+                        CategoryResponseDto categoryDto = new CategoryResponseDto();
+                        categoryDto.setId(event.getCategory().getId());
+                        categoryDto.setName(event.getCategory().getName());
+                        eventShortResponse.setCategory(categoryDto);
+                    }
+
+                    if (event.getInitiator() != null) {
+                        UserShortDto userDto = new UserShortDto();
+                        userDto.setId(event.getInitiator().getId());
+                        userDto.setName(event.getInitiator().getName());
+                        eventShortResponse.setInitiator(userDto);
+                    }
+
+                    return eventShortResponse;
+                })
                 .toList();
 
         compilationResponse.setId(compilation.getId());

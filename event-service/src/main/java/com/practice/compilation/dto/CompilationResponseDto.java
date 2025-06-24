@@ -12,7 +12,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CompilationResponseDto {
     @NotBlank
-    int id;
+    Integer id;
 
     @NotBlank
     String title;
