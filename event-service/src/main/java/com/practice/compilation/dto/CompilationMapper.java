@@ -2,7 +2,6 @@ package com.practice.compilation.dto;
 
 import com.practice.category.model.CategoryResponseDto;
 import com.practice.compilation.model.Compilation;
-import com.practice.event.dto.EventMapper;
 import com.practice.event.dto.EventShortResponseDto;
 import com.practice.event.dto.UserShortDto;
 import com.practice.event.model.Event;
@@ -24,16 +23,6 @@ public class CompilationMapper {
         compilation.setTitle(compilationCreate.getTitle() != null ? compilationCreate.getTitle() : "");
         compilation.setPinned(compilationCreate.getPinned() != null && compilationCreate.getPinned());
         compilation.setEvents(findAllEventsByIds(compilationCreate.getEventIds()));
-
-        return compilation;
-    }
-
-    public Compilation fromUpdate(CompilationUpdateDto compilationUpdate) {
-        Compilation compilation = new Compilation();
-
-        compilation.setTitle(compilationUpdate.getTitle());
-        compilation.setPinned(compilationUpdate.getPinned());
-        compilation.setEvents(findAllEventsByIds(compilationUpdate.getEventIds()));
 
         return compilation;
     }
