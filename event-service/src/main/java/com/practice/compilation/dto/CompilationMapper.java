@@ -27,6 +27,16 @@ public class CompilationMapper {
         return compilation;
     }
 
+    public Compilation fromUpdate(CompilationUpdateDto compilationUpdate) {
+        Compilation compilation = new Compilation();
+
+        compilation.setTitle(compilationUpdate.getTitle());
+        compilation.setPinned(compilationUpdate.getPinned());
+        compilation.setEvents(findAllEventsByIds(compilationUpdate.getEventIds()));
+
+        return compilation;
+    }
+
     public CompilationResponseDto toResponse(Compilation compilation) {
         CompilationResponseDto compilationResponse = new CompilationResponseDto();
 
