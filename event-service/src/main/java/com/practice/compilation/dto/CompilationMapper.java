@@ -86,4 +86,4 @@ public class CompilationMapper {
         }
         return eventRepository.findAllById(eventIds);
     }
- }
+}
