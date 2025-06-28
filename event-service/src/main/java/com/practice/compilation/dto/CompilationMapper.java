@@ -22,7 +22,7 @@ public class CompilationMapper {
 
         compilation.setTitle(compilationCreate.getTitle() != null ? compilationCreate.getTitle() : "");
         compilation.setPinned(compilationCreate.getPinned() != null && compilationCreate.getPinned());
-        compilation.setEvents(findAllEventsByIds(compilationCreate.getEventIds()));
+        compilation.setEvents(findAllEventsByIds(compilationCreate.getEvents()));
 
         return compilation;
     }
@@ -32,7 +32,7 @@ public class CompilationMapper {
 
         compilation.setTitle(compilationUpdate.getTitle());
         compilation.setPinned(compilationUpdate.getPinned());
-        compilation.setEvents(findAllEventsByIds(compilationUpdate.getEventIds()));
+        compilation.setEvents(findAllEventsByIds(compilationUpdate.getEvents()));
 
         return compilation;
     }

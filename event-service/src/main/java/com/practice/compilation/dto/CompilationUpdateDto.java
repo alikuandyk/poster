@@ -19,5 +19,5 @@ public class CompilationUpdateDto {
     Boolean pinned = false;
 
     @UniqueElements(message = "Список событий должен содержать только уникальные значения")
-    List<Integer> eventIds;
+    List<Integer> events;
 }
